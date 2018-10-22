@@ -116,3 +116,8 @@ INSERT INTO `empresa03`.`producto` VALUES (1,'MARTILLO','200'),(2,'BROCHA','150'
 INSERT INTO `empresa03`.`vendedor` VALUES (1,'ROGER','04120452266',1),(2,'SANTIAGO','04121234321',2),(18,'ROGER','04120452266',2);
 
 ``` 
+## Eclipse o STS
+```
+File -> Import -> Maven -> Existing Maven project
+```
+
