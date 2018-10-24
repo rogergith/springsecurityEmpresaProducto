@@ -24,7 +24,7 @@ import com.empresa.security.JwtAuthorizationTokenFilter;
 import com.empresa.security.service.JwtUserDetailsService;
 
 @Configuration
-@ComponentScan(basePackages= {"com.test.security","com.test.config", "com.test.security.controller"})
+@ComponentScan(basePackages= {"com.empresa.security","com.empresa.config", "com.empresa.security.controller"})
 @EnableWebSecurity
 @EnableGlobalMethodSecurity(prePostEnabled = true)
 public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
@@ -63,30 +63,26 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 
     @Override
     protected void configure(HttpSecurity httpSecurity) throws Exception {
-        httpSecurity
-            // we don't need CSRF because our token is invulnerable
-            .csrf().disable()
+        
+    	// we don't need CSRF because our token is invulnerable
+    	httpSecurity.csrf().disable();
 
-            .exceptionHandling().authenticationEntryPoint(unauthorizedHandler).and()
+    	httpSecurity.exceptionHandling().authenticationEntryPoint(unauthorizedHandler);
 
-            // don't create session
-            .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS).and()
+        // don't create session
+    	httpSecurity.sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS);
 
-            .authorizeRequests()
-
+    	httpSecurity.authorizeRequests()
             // Un-secure H2 Database
             //.antMatchers("/h2-console/**/**").permitAll()
-            
             .antMatchers("/empresa").hasAnyRole("ADMIN", "USER")
             .antMatchers("/producto").hasAnyRole("ADMIN", "USER")
             .antMatchers("/vendedor").hasAnyRole("ADMIN", "USER")
             .antMatchers("/home").hasAnyRole("ADMIN", "USER")
-            
-            .antMatchers("/auth/**").permitAll()
+            .antMatchers("/","/auth/**").permitAll()
             .anyRequest().authenticated();
 
-       httpSecurity
-            .addFilterBefore(authenticationTokenFilter, UsernamePasswordAuthenticationFilter.class);
+       httpSecurity.addFilterBefore(authenticationTokenFilter, UsernamePasswordAuthenticationFilter.class);
 
         // disable page caching
         httpSecurity
@@ -96,32 +92,27 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
         
     }
 
-//    @Override
-//    public void configure(WebSecurity web) throws Exception {
-//        // AuthenticationTokenFilter will ignore the below paths
-//        web
-//            .ignoring()
-//            .antMatchers(
-//                HttpMethod.POST,
-//                "/auth"
-//            )
-//
-//            // allow anonymous resource requests
-//            .and()
-//            .ignoring()
-//            .antMatchers(
-//                HttpMethod.GET,
-//                "/",
-//                "/*.html",
-//                "/favicon.ico",
-//                "/**/*.html",
-//                "/**/*.css",
-//                "/**/*.js"
-//            )
-//
-//            // Un-secure H2 Database (for testing purposes, H2 console shouldn't be unprotected in production)
-//            .and()
-//            .ignoring()
-//            .antMatchers("/h2-console/**/**");
-//    }
+    @Override
+    public void configure(WebSecurity web) throws Exception {
+        // AuthenticationTokenFilter will ignore the below paths
+        web.ignoring().antMatchers(HttpMethod.POST,"/auth")
+
+            // allow anonymous resource requests
+            .and()
+            .ignoring()
+            .antMatchers(
+                HttpMethod.GET,
+                "/",
+                "/*.html",
+                "/favicon.ico",
+                "/**/*.html",
+                "/**/*.css",
+                "/**/*.js"
+            )
+
+            // Un-secure H2 Database (for testing purposes, H2 console shouldn't be unprotected in production)
+            .and()
+            .ignoring()
+            .antMatchers("/h2-console/**/**");
+    }
 }
